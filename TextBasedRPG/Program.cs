@@ -10,8 +10,9 @@ namespace TextBasedRPG
     internal class Program
     {
 
-    static int y = 10;
-    static int x = 10;
+    static char currentTile;
+    static int cursory = 10;
+    static int cursorx = 10;
     static bool gameOver = false;
 
     static void PlayerDraw(int x, int y)
@@ -36,10 +37,12 @@ namespace TextBasedRPG
             {
                 char tile = mapRow[x];
                 Console.Write(tile);
+                currentTile = mapRows[cursory][cursorx];
             }
             Console.WriteLine();
         }
-    }
+            Console.Write("Current Tile Of The Player Position: " + currentTile);
+        }
 
 
     static void PlayerUpdate()
@@ -48,23 +51,23 @@ namespace TextBasedRPG
 
         if (input.Key == ConsoleKey.W)
         {
-            y--;
-            if (y < 0) y = 0;
+            cursory--;
+            if (cursory < 0) cursory = 0;
         }
         else if (input.Key == ConsoleKey.A)
         {
-            x--;
-            if (x < 0) x = 0;
+            cursorx--;
+            if (cursorx < 0) cursorx = 0;
         }
         else if (input.Key == ConsoleKey.D)
         {
-            x++;
-            if (x > 50) x = 50;
+            cursorx++;
+            if (cursorx > 50) cursorx = 50;
         }
         else if (input.Key == ConsoleKey.S)
         {
-            y++;
-            if (y > 50) y = 50;
+            cursory++;
+            if (cursory > 50) cursory = 50;
         }
         else if (input.Key == ConsoleKey.Escape)
         {
@@ -79,7 +82,7 @@ namespace TextBasedRPG
         RenderMap();
         while (!gameOver)
         {
-            PlayerDraw(x, y);
+            PlayerDraw(cursorx, cursory);
             PlayerUpdate();
             RenderMap();
         }
