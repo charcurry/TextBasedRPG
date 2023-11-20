@@ -42,7 +42,7 @@ namespace TextBasedRPG
             Console.WriteLine();
         }
             Console.Write("Current Tile Of The Player Position: " + currentTile);
-        }
+    }
 
 
     static void PlayerUpdate()
