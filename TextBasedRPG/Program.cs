@@ -9,14 +9,17 @@ namespace TextBasedRPG
 {
     internal class Program
     {
-
-    static char nextTileUp;
+    static bool enemyDead = false;
+        static bool playerDead = false;
+        static char nextTileUp;
     static char nextTileDown;
     static char nextTileLeft;
     static char nextTileRight;
     static char currentTile;
     static int cursory = 10;
     static int cursorx = 10;
+    static int enemyCursory = 10;
+    static int enemyCursorx = 16;
     static bool gameOver = false;
 
     static void PlayerDraw(int x, int y)
@@ -65,32 +68,69 @@ namespace TextBasedRPG
         if (input.Key == ConsoleKey.W)
         {
             cursory--;
-            if (cursory < 0) cursory = 0;
-            else if (nextTileUp == '^') cursory ++;
+                if (cursory < 0) cursory = 0;
+                else if (nextTileUp == '^') cursory++;
+                else if (enemyCursorx == cursorx && enemyCursory == cursory - 1) { enemyDead = true; }
         }
         else if (input.Key == ConsoleKey.A)
         {
             cursorx--;
-            if (cursorx < 0) cursorx = 0;
-            else if (nextTileLeft == '^') cursorx ++;
-        }
+                if (cursorx < 0) cursorx = 0;
+                else if (nextTileLeft == '^') cursorx++;
+                else if (enemyCursorx == cursorx - 1 && enemyCursory == cursory) { enemyDead = true; }
+            }
         else if (input.Key == ConsoleKey.D)
         {
             cursorx++;
-            if (cursorx > 50) cursorx = 50;
-            else if (nextTileRight == '^') cursorx --;
-        }
+                if (cursorx > 50) cursorx = 50;
+                else if (nextTileRight == '^') cursorx --;
+                else if (enemyCursorx == cursorx + 1 && enemyCursory == cursory) { enemyDead = true; }
+            }
         else if (input.Key == ConsoleKey.S)
         {
             cursory++;
-            if (cursory > 50) cursory = 50;
-            else if (nextTileDown == '^') cursory --;
-        }
+                if (cursory > 50) cursory = 50;
+                else if (nextTileDown == '^') cursory --;
+                else if (enemyCursorx == cursorx && enemyCursory == cursory + 1) { enemyDead = true; }
+            }
         else if (input.Key == ConsoleKey.Escape)
         {
             gameOver = true;
         }
     }
+
+
+    static void EnemyDraw(int x, int y)
+    {
+        Console.SetCursorPosition(x, y);
+        Console.WriteLine("G");
+    }
+
+    static void EnemyUpdate()
+        {
+            Random random = new Random();
+            int direction = random.Next(0, 4);
+
+            switch (direction)
+            {
+                case 0: enemyCursorx--;
+                    if (enemyCursorx < 0) enemyCursorx = 0;
+                    else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
+                    break;
+                case 1: enemyCursory++;
+                    if (enemyCursory > 50) enemyCursory = 50;
+                    else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
+                    break;
+                case 2: enemyCursory--;
+                    if (enemyCursory < 0) enemyCursory = 0;
+                    else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
+                    break;
+                case 3: enemyCursorx++;
+                    if (enemyCursorx > 50) enemyCursorx = 50;
+                    else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
+                    break;
+            }
+        }
 
     static void Main(string[] args)
     {
@@ -99,8 +139,22 @@ namespace TextBasedRPG
         RenderMap();
         while (!gameOver)
         {
-            PlayerDraw(cursorx, cursory);
-            PlayerUpdate();
+            if (!playerDead)
+                {
+                    PlayerDraw(cursorx, cursory);
+                }
+            if(!enemyDead)
+            {
+                EnemyDraw(enemyCursorx, enemyCursory);
+            }
+            if (!playerDead)
+                {
+                    PlayerUpdate();
+                }
+            if (!enemyDead)
+            {
+                EnemyUpdate();
+            }
             RenderMap();
         }
 
