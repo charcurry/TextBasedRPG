@@ -63,11 +63,11 @@ namespace TextBasedRPG
                     mapX = mapRow.Length;
                 char tile = mapRow[x];
                 Console.Write(tile);
-                    if (cursorx - offset < mapRow.Length && cursorx - offset > 0 && cursory - offset < mapRows.Length && cursory - offset > 0)
+                    if (cursorx - offset < mapRow.Length && cursorx > 0 && cursory - offset < mapRows.Length && cursory > 0)
                     {
                         currentTile = mapRows[cursory - offset][cursorx - offset];
                     }
-                    if (cursory - offset > 1)
+                    if (cursory - offset > 0)
                     {
                         nextTileUp = mapRows[cursory - 1 - offset][cursorx - offset];
                     }
@@ -75,7 +75,7 @@ namespace TextBasedRPG
                     {
                         nextTileDown = mapRows[cursory + 1 - offset][cursorx - offset];
                     }
-                    if (cursorx - offset > 1)
+                    if (cursorx - offset > 0)
                     {
                         nextTileLeft = mapRows[cursory - offset][cursorx - 1 - offset];
                     }
@@ -87,7 +87,7 @@ namespace TextBasedRPG
                     //{
                     //    enemyCurrentTile = mapRows[enemyCursory - offset][enemyCursorx - offset];
                     //}
-                    if (enemyCursory - offset > 1)
+                    if (enemyCursory - offset > 0)
                     {
                         enemyNextTileUp = mapRows[enemyCursory - 1 - offset][enemyCursorx - offset];
                     }
@@ -95,7 +95,7 @@ namespace TextBasedRPG
                     {
                         enemyNextTileDown = mapRows[enemyCursory + 1 - offset][enemyCursorx - offset];
                     }
-                    if (enemyCursorx - offset > 1)
+                    if (enemyCursorx - offset > 0)
                     {
                         enemyNextTileLeft = mapRows[enemyCursory - offset][enemyCursorx - 1 - offset];
                     }
@@ -114,15 +114,15 @@ namespace TextBasedRPG
             }
             Console.Write('+');
             Console.WriteLine();
-            Console.WriteLine("Current Tile Of The Player Position: " + currentTile);
-            Console.WriteLine("Next Tile Up From The Player Position: " + nextTileUp);
-            Console.WriteLine("Next Tile Down From The Player Position: " + nextTileDown);
-            Console.WriteLine("Next Tile Left From The Player Position: " + nextTileLeft);
-            Console.WriteLine("Next Tile Right From The Player Position: " + nextTileRight);
-            Console.WriteLine("Cursor X " + cursorx);
-            Console.WriteLine("Cursor Y " + cursory);
-            Console.WriteLine("Enemy Cursor X " + enemyCursorx);
-            Console.WriteLine("Enemy Cursor Y " + enemyCursory);
+            //Console.WriteLine("Current Tile Of The Player Position: " + currentTile);
+            //Console.WriteLine("Next Tile Up From The Player Position: " + nextTileUp);
+            //Console.WriteLine("Next Tile Down From The Player Position: " + nextTileDown);
+            //Console.WriteLine("Next Tile Left From The Player Position: " + nextTileLeft);
+            //Console.WriteLine("Next Tile Right From The Player Position: " + nextTileRight);
+            //Console.WriteLine("Cursor X " + cursorx);
+            //Console.WriteLine("Cursor Y " + cursory);
+            //Console.WriteLine("Enemy Cursor X " + enemyCursorx);
+            //Console.WriteLine("Enemy Cursor Y " + enemyCursory);
             //Console.WriteLine("Player Dead: " + playerDead);
             //Console.WriteLine("GameOver " + gameOver);
             //Console.WriteLine("Player Victory " + playerVictory);
@@ -131,17 +131,27 @@ namespace TextBasedRPG
             //Console.WriteLine("Next Tile Down From The Enemy Position: " + enemyNextTileDown);
             //Console.WriteLine("Next Tile Left From The Enemy Position: " + enemyNextTileLeft);
             //Console.WriteLine("Next Tile Right From The Enemy Position: " + enemyNextTileRight);
-
         }
 
         static void EnemyTakeDamage(int damage)
         {
-
+            enemyHealth -= damage;
+            if (enemyHealth <= 0)
+            {
+                enemyDead = true;
+                gameOver = true;
+                playerVictory = true;
+            }
         }
 
         static void PlayerTakeDamage(int damage)
         {
-
+            playerHealth -= damage;
+            if (playerHealth <= 0)
+            {
+                playerDead = true;
+                gameOver = true;
+            }
         }
 
         static void PlayerUpdate()
@@ -155,10 +165,9 @@ namespace TextBasedRPG
                 else if (nextTileUp == '^') cursory++;
                 else if (enemyCursorx == cursorx && enemyCursory == cursory)
                 {
-                    enemyDead = true;
-                    gameOver = true;
-                    playerVictory = true;
+                    EnemyTakeDamage(1);
                     cursory++;
+                    enemyCursory--;
                 }
             }
         else if (input.Key == ConsoleKey.A)
@@ -168,10 +177,9 @@ namespace TextBasedRPG
                 else if (nextTileLeft == '^') cursorx++;
                 else if (enemyCursorx == cursorx && enemyCursory == cursory)
                 {
-                    enemyDead = true;
-                    gameOver = true;
-                    playerVictory = true;
+                    EnemyTakeDamage(1);
                     cursorx++;
+                    enemyCursorx--;
                 }
             }
         else if (input.Key == ConsoleKey.D)
@@ -181,10 +189,9 @@ namespace TextBasedRPG
                 else if (nextTileRight == '^') cursorx--;
                 else if (enemyCursorx == cursorx && enemyCursory == cursory)
                 {
-                    enemyDead = true;
-                    gameOver = true;
-                    playerVictory = true;
+                    EnemyTakeDamage(1);
                     cursorx--;
+                    enemyCursorx++;
                 }
             }
         else if (input.Key == ConsoleKey.S)
@@ -193,11 +200,10 @@ namespace TextBasedRPG
                 if (cursory > 16) cursory = 16;
                 else if (nextTileDown == '^') cursory--;
                 else if (enemyCursorx == cursorx && enemyCursory == cursory) 
-                { 
-                    enemyDead = true; 
-                    gameOver = true; 
-                    playerVictory = true;
+                {
+                    EnemyTakeDamage(1);
                     cursory--;
+                    enemyCursory++;
                 }
             }
         else if (input.Key == ConsoleKey.Escape)
@@ -250,25 +256,25 @@ namespace TextBasedRPG
                         enemyCursorx--;
                         if (enemyCursorx < 0) enemyCursorx = 0;
                         else if (enemyNextTileLeft == '^') enemyCursorx++;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; enemyCursorx++; }
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursorx++; cursorx -= 2; }
                         break;
                     case 1:
                         enemyCursory++;
                         if (enemyCursory > 15) enemyCursory = 15;
                         else if (enemyNextTileDown == '^') enemyCursory--;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; enemyCursory--; }
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursory--; cursory += 2; }
                         break;
                     case 2:
                         enemyCursory--;
                         if (enemyCursory < 0) enemyCursory = 0;
                         else if (enemyNextTileUp == '^') enemyCursory++;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; enemyCursory++; }
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursory++; cursory -= 2; }
                         break;
                     case 3:
                         enemyCursorx++;
                         if (enemyCursorx > 33) enemyCursorx = 33;
                         else if (enemyNextTileRight == '^') enemyCursorx--;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; enemyCursorx--; }
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursorx--; cursorx += 2; }
                         break;
                 }
             }
@@ -276,10 +282,13 @@ namespace TextBasedRPG
 
         static void Main(string[] args)
     {
-        //Console.WriteLine("MiniGame");
-        //Console.WriteLine();
-        RenderMap();
+            //Console.WriteLine("MiniGame");
+            //Console.WriteLine();
+            Console.CursorVisible = false;
             RenderMap();
+            RenderMap();
+            Console.WriteLine("Player Health: " + playerHealth);
+            Console.WriteLine("Enemy Health: " + enemyHealth);
         while (!gameOver)
         {
             if (!playerDead)
@@ -299,7 +308,9 @@ namespace TextBasedRPG
                 EnemyUpdate();
             }
             RenderMap();
-        }
+                Console.WriteLine("Player Health: " + playerHealth);
+                Console.WriteLine("Enemy Health: " + enemyHealth);
+            }
         if (playerVictory)
             {
                 Console.Clear();
