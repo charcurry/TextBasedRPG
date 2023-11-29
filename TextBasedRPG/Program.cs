@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Diagnostics.SymbolStore;
 
 namespace TextBasedRPG
 {
@@ -21,6 +22,7 @@ namespace TextBasedRPG
     static int enemyCursory = 10;
     static int enemyCursorx = 16;
     static bool gameOver = false;
+        static bool playerVictory = false;
 
     static void PlayerDraw(int x, int y)
     {
@@ -44,20 +46,44 @@ namespace TextBasedRPG
             {
                 char tile = mapRow[x];
                 Console.Write(tile);
-                currentTile = mapRows[cursory][cursorx];
+                    if (cursorx < 33 && cursorx > 0 && cursory < 16 && cursory > 0)
+                    {
+                        currentTile = mapRows[cursory][cursorx];
+                    }
                     //if (cursory <= 0) return;
-                    nextTileUp = mapRows[cursory - 1][cursorx];
-                    nextTileDown = mapRows[cursory + 1][cursorx];
-                    nextTileLeft = mapRows[cursory][cursorx - 1];
-                    nextTileRight = mapRows[cursory][cursorx + 1];
+                    if (cursory > 0)
+                    {
+                        nextTileUp = mapRows[cursory - 1][cursorx];
+                    }
+                    if (mapRows.Length - 1 > cursory)
+                    {
+                        nextTileDown = mapRows[cursory + 1][cursorx];
+                    }
+                    if (cursorx > 0)
+                    {
+                        nextTileLeft = mapRows[cursory][cursorx - 1];
+                    }
+                    if (cursorx < mapRow.Length - 1)
+                    {
+                        nextTileRight = mapRows[cursory][cursorx + 1];
+                    }
+                    //Console.WriteLine("MapRow Length" + mapRow.Length);
                 }
             Console.WriteLine();
-        }
+        }   
             Console.WriteLine("Current Tile Of The Player Position: " + currentTile);
             Console.WriteLine("Next Tile Up From The Player Position: " + nextTileUp);
             Console.WriteLine("Next Tile Down From The Player Position: " + nextTileDown);
             Console.WriteLine("Next Tile Left From The Player Position: " + nextTileLeft);
             Console.WriteLine("Next Tile Right From The Player Position: " + nextTileRight);
+            Console.WriteLine("Cursor X " + cursorx);
+            Console.WriteLine("Cursor Y " + cursory);
+            Console.WriteLine("Enemy Cursor X " + enemyCursorx);
+            Console.WriteLine("Enemy Cursor Y " + enemyCursory);
+            Console.WriteLine("Player Dead: " + playerDead);
+            Console.WriteLine("GameOver " + gameOver);
+            Console.WriteLine("Player Victory " + playerVictory);
+
         }
 
 
@@ -70,33 +96,38 @@ namespace TextBasedRPG
             cursory--;
                 if (cursory < 0) cursory = 0;
                 else if (nextTileUp == '^') cursory++;
-                else if (enemyCursorx == cursorx && enemyCursory == cursory - 1) { enemyDead = true; }
+                else if (enemyCursorx == cursorx && enemyCursory == cursory - 1) { enemyDead = true; playerVictory = true; }
         }
         else if (input.Key == ConsoleKey.A)
         {
             cursorx--;
                 if (cursorx < 0) cursorx = 0;
                 else if (nextTileLeft == '^') cursorx++;
-                else if (enemyCursorx == cursorx - 1 && enemyCursory == cursory) { enemyDead = true; }
+                else if (enemyCursorx == cursorx - 1 && enemyCursory == cursory) { enemyDead = true; playerVictory = true; }
             }
         else if (input.Key == ConsoleKey.D)
         {
             cursorx++;
-                if (cursorx > 50) cursorx = 50;
-                else if (nextTileRight == '^') cursorx --;
-                else if (enemyCursorx == cursorx + 1 && enemyCursory == cursory) { enemyDead = true; }
+                if (cursorx > 33) cursorx = 33;
+                else if (nextTileRight == '^') cursorx--;
+                else if (enemyCursorx == cursorx + 1 && enemyCursory == cursory) { enemyDead = true; playerVictory = true; }
             }
         else if (input.Key == ConsoleKey.S)
         {
             cursory++;
-                if (cursory > 50) cursory = 50;
-                else if (nextTileDown == '^') cursory --;
-                else if (enemyCursorx == cursorx && enemyCursory == cursory + 1) { enemyDead = true; }
+                if (cursory > 15) cursory = 15;
+                else if (nextTileDown == '^') cursory--;
+                else if (enemyCursorx == cursorx && enemyCursory == cursory + 1) { enemyDead = true; playerVictory = true; }
             }
         else if (input.Key == ConsoleKey.Escape)
         {
             gameOver = true;
         }
+
+        if (playerDead)
+            {
+                gameOver = true;
+            }
     }
 
 
@@ -110,25 +141,51 @@ namespace TextBasedRPG
         {
             Random random = new Random();
             int direction = random.Next(0, 4);
-
-            switch (direction)
+            if (playerDead)
             {
-                case 0: enemyCursorx--;
-                    if (enemyCursorx < 0) enemyCursorx = 0;
-                    else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
-                    break;
-                case 1: enemyCursory++;
-                    if (enemyCursory > 50) enemyCursory = 50;
-                    else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
-                    break;
-                case 2: enemyCursory--;
-                    if (enemyCursory < 0) enemyCursory = 0;
-                    else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
-                    break;
-                case 3: enemyCursorx++;
-                    if (enemyCursorx > 50) enemyCursorx = 50;
-                    else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
-                    break;
+                gameOver = true;
+            }
+            else if (enemyCursorx - 1 == cursorx)
+            {
+                direction = 0;
+            }
+            else if (enemyCursorx + 1 == cursorx)
+            {
+                direction = 3;
+            }
+            else if (enemyCursory - 1 == cursory)
+            {
+                direction = 2;
+            }
+            else if (enemyCursory + 1 == cursory)
+            {
+                direction = 1;
+            }
+            if (!enemyDead)
+            {
+                switch (direction)
+                {
+                    case 0:
+                        enemyCursorx--;
+                        if (enemyCursorx < 0) enemyCursorx = 0;
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
+                        break;
+                    case 1:
+                        enemyCursory++;
+                        if (enemyCursory > 15) enemyCursory = 15;
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
+                        break;
+                    case 2:
+                        enemyCursory--;
+                        if (enemyCursory < 0) enemyCursory = 0;
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
+                        break;
+                    case 3:
+                        enemyCursorx++;
+                        if (enemyCursorx > 33) enemyCursorx = 33;
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { playerDead = true; }
+                        break;
+                }
             }
         }
 
@@ -137,7 +194,7 @@ namespace TextBasedRPG
         Console.WriteLine("MiniGame");
         Console.WriteLine();
         RenderMap();
-        while (!gameOver)
+        while (!!gameOver || !playerVictory)
         {
             if (!playerDead)
                 {
@@ -157,7 +214,16 @@ namespace TextBasedRPG
             }
             RenderMap();
         }
-
+        if (playerVictory)
+            {
+                Console.Clear();
+                Console.WriteLine("Victory");
+            }
+        if (gameOver)
+            {
+                Console.Clear();
+                Console.WriteLine("Game Over");
+            }
         Console.WriteLine();
         Console.WriteLine("Press any key to continue...");
         Console.ReadKey(true);
