@@ -12,61 +12,70 @@ namespace TextBasedRPG
     {
         static bool enemyDead = false;
         static bool playerDead = false;
+
         static char nextTileUp;
         static char nextTileDown;
         static char nextTileLeft;
         static char nextTileRight;
-        static char currentTile;
+
         static int cursory = 10;
         static int cursorx = 10;
         static int enemyCursory = 10;
         static int enemyCursorx = 16;
-        static char enemyCurrentTile;
+
         static char enemyNextTileUp;
         static char enemyNextTileDown;
         static char enemyNextTileLeft;
         static char enemyNextTileRight;
+
         static bool gameOver = false;
         static bool playerVictory = false;
+
         static int enemyHealth = 4;
         static int playerHealth = 4;
+
         static int mapX;
+
         static int offset = 1;
+
+        static bool enemyWasAttacked;
+
+        static char wallTile = '^';
+
         static void PlayerDraw(int x, int y)
     {
         Console.SetCursorPosition(x, y);
         Console.WriteLine("@");
     }
 
+        static string path = @"map.txt";
+        static string[] mapRows = File.ReadAllLines(path);
+
         static void RenderMap()
-    {
-        Console.SetCursorPosition(0, 0);
-        string path = @"map.txt";
-
-        string[] mapRows;
-
-        mapRows = File.ReadAllLines(path);
+        {
+            Console.SetCursorPosition(0, 0);
+        
 
             Console.Write('+');
-        for (int i = 0; i < mapX; i++)
+            for (int i = 0; i < mapX; i++)
             {
                 Console.Write('-');
             }
             Console.Write('+');
             Console.WriteLine();
-        for (int y = 0; y < mapRows.Length; y++)
-        {
+            for (int y = 0; y < mapRows.Length; y++)
+            {
             Console.Write('|');
             string mapRow = mapRows[y];
             for (int x = 0; x < mapRow.Length; x++)
             {
-                    mapX = mapRow.Length;
+                mapX = mapRow.Length;
                 char tile = mapRow[x];
                 Console.Write(tile);
-                    if (cursorx - offset < mapRow.Length && cursorx > 0 && cursory - offset < mapRows.Length && cursory > 0)
-                    {
-                        currentTile = mapRows[cursory - offset][cursorx - offset];
-                    }
+                    //if (cursorx - offset < mapRow.Length && cursorx > 0 && cursory - offset < mapRows.Length && cursory > 0)
+                    //{
+                    //    currentTile = mapRows[cursory - offset][cursorx - offset];
+                    //}
                     if (cursory - offset > 0)
                     {
                         nextTileUp = mapRows[cursory - 1 - offset][cursorx - offset];
@@ -106,7 +115,7 @@ namespace TextBasedRPG
                 }
                 Console.Write('|');
                 Console.WriteLine();
-        }
+            }
             Console.Write('+');
             for (int i = 0; i < mapX; i++)
             {
@@ -155,78 +164,93 @@ namespace TextBasedRPG
         }
 
         static void PlayerUpdate()
-    {
-        ConsoleKeyInfo input = Console.ReadKey(true);
-
-        if (input.Key == ConsoleKey.W)
         {
-            cursory--;
+            ConsoleKeyInfo input = Console.ReadKey(true);
+
+            if (input.Key == ConsoleKey.W)
+            {
+                cursory--;
                 if (cursory < 1) cursory = 1;
-                else if (nextTileUp == '^') cursory++;
+                else if (CheckForWall(nextTileUp, wallTile)) cursory++;
                 else if (enemyCursorx == cursorx && enemyCursory == cursory)
                 {
                     EnemyTakeDamage(1);
                     cursory++;
                     enemyCursory--;
-                    if (enemyNextTileUp == '^') enemyCursory++;
+                    if (CheckForWall(enemyNextTileUp, wallTile) || enemyCursory < 1) enemyCursory++;
+                    enemyWasAttacked = true;
                 }
             }
-        else if (input.Key == ConsoleKey.A)
-        {
-            cursorx--;
+            else if (input.Key == ConsoleKey.A)
+            {
+                cursorx--;
                 if (cursorx < 1) cursorx = 1;
-                else if (nextTileLeft == '^') cursorx++;
+                else if (CheckForWall(nextTileLeft, wallTile)) cursorx++;
                 else if (enemyCursorx == cursorx && enemyCursory == cursory)
                 {
                     EnemyTakeDamage(1);
                     cursorx++;
                     enemyCursorx--;
-                    if (enemyNextTileLeft == '^') enemyCursorx++;
+                    if (CheckForWall(enemyNextTileLeft, wallTile) || enemyCursorx < 1) enemyCursorx++;
+                    enemyWasAttacked = true;
                 }
             }
-        else if (input.Key == ConsoleKey.D)
-        {
-            cursorx++;
+            else if (input.Key == ConsoleKey.D)
+            {
+                cursorx++;
                 if (cursorx > 34) cursorx = 34;
-                else if (nextTileRight == '^') cursorx--;
+                else if (CheckForWall(nextTileRight, wallTile)) cursorx--;
                 else if (enemyCursorx == cursorx && enemyCursory == cursory)
                 {
                     EnemyTakeDamage(1);
                     cursorx--;
                     enemyCursorx++;
-                    if (enemyNextTileRight == '^') enemyCursorx--;
+                    if (CheckForWall(enemyNextTileRight, wallTile) || enemyCursorx > 34) enemyCursorx--;
+                    enemyWasAttacked = true;
                 }
             }
-        else if (input.Key == ConsoleKey.S)
-        {
-            cursory++;
+            else if (input.Key == ConsoleKey.S)
+            {
+                cursory++;
                 if (cursory > 16) cursory = 16;
-                else if (nextTileDown == '^') cursory--;
-                else if (enemyCursorx == cursorx && enemyCursory == cursory) 
+                else if (CheckForWall(nextTileDown, wallTile)) cursory--;
+                else if (enemyCursorx == cursorx && enemyCursory == cursory)
                 {
                     EnemyTakeDamage(1);
                     cursory--;
                     enemyCursory++;
-                    if (enemyNextTileDown == '^') enemyCursory--;
+                    if (CheckForWall(enemyNextTileDown, wallTile) || enemyCursory > 16) enemyCursory--;
+                    enemyWasAttacked = true;
                 }
             }
-        else if (input.Key == ConsoleKey.Escape)
-        {
-            gameOver = true;
-        }
-
-        if (playerDead)
+            else if (input.Key == ConsoleKey.Escape)
             {
                 gameOver = true;
             }
-    }
 
+            if (playerDead)
+            {
+                gameOver = true;
+            }
+        }
+
+        static bool CheckForWall(char tile, char wallTile)
+        {
+            if (tile == wallTile)
+            {
+                return true;
+            }
+            else 
+            {
+                return false; 
+            }
+        }
 
         static void EnemyDraw(int x, int y)
-    {
-        Console.SetCursorPosition(x, y);
-        Console.WriteLine("G");
-    }
+        {
+            Console.SetCursorPosition(x, y);
+            Console.WriteLine("G");
+        }
 
         static void EnemyUpdate()
         {
@@ -259,28 +283,28 @@ namespace TextBasedRPG
                     case 0:
                         enemyCursorx--;
                         if (enemyCursorx < 1) enemyCursorx = 1;
-                        else if (enemyNextTileLeft == '^') enemyCursorx++;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) 
-                        { 
-                            PlayerTakeDamage(1); 
+                        else if (CheckForWall(enemyNextTileLeft, wallTile)) enemyCursorx++;
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory)
+                        {
+                            PlayerTakeDamage(1);
                             enemyCursorx++;
                             cursorx--;
-                            if (nextTileLeft == '^') 
+                            if (CheckForWall(nextTileLeft, wallTile) || cursorx < 1)
                             {
-                                cursorx++; 
+                                cursorx++;
                             }
                         }
                         break;
                     case 1:
                         enemyCursory++;
                         if (enemyCursory > 16) enemyCursory = 16;
-                        else if (enemyNextTileDown == '^') enemyCursory--;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) 
-                        { 
-                            PlayerTakeDamage(1); 
-                            enemyCursory--; 
-                            cursory ++;
-                            if (nextTileDown == '^')
+                        else if (CheckForWall(enemyNextTileDown, wallTile)) enemyCursory--;
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory)
+                        {
+                            PlayerTakeDamage(1);
+                            enemyCursory--;
+                            cursory++;
+                            if (CheckForWall(nextTileDown, wallTile) || cursory > 16)
                             {
                                 cursory--;
                             }
@@ -289,13 +313,13 @@ namespace TextBasedRPG
                     case 2:
                         enemyCursory--;
                         if (enemyCursory < 1) enemyCursory = 1;
-                        else if (enemyNextTileUp == '^') enemyCursory++;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) 
-                        { 
-                            PlayerTakeDamage(1); 
-                            enemyCursory++; 
-                            cursory --;
-                            if (nextTileUp == '^')
+                        else if (CheckForWall(enemyNextTileUp, wallTile)) enemyCursory++;
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory)
+                        {
+                            PlayerTakeDamage(1);
+                            enemyCursory++;
+                            cursory--;
+                            if (CheckForWall(nextTileUp, wallTile) || cursory < 1)
                             {
                                 cursory++;
                             }
@@ -304,13 +328,13 @@ namespace TextBasedRPG
                     case 3:
                         enemyCursorx++;
                         if (enemyCursorx > 34) enemyCursorx = 34;
-                        else if (enemyNextTileRight == '^') enemyCursorx--;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) 
-                        { 
-                            PlayerTakeDamage(1); 
-                            enemyCursorx--; 
-                            cursorx ++;
-                            if (nextTileRight == '^')
+                        else if (CheckForWall(enemyNextTileRight, wallTile)) enemyCursorx--;
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory)
+                        {
+                            PlayerTakeDamage(1);
+                            enemyCursorx--;
+                            cursorx++;
+                            if (CheckForWall(nextTileRight, wallTile) || cursorx > 34)
                             {
                                 cursorx--;
                             }
@@ -321,7 +345,7 @@ namespace TextBasedRPG
         }
 
         static void Main(string[] args)
-    {
+        {
             //Console.WriteLine("MiniGame");
             //Console.WriteLine();
             Console.CursorVisible = false;
@@ -329,34 +353,38 @@ namespace TextBasedRPG
             RenderMap();
             Console.WriteLine("Player Health: " + playerHealth);
             Console.WriteLine("Enemy Health: " + enemyHealth);
-        while (!gameOver)
-        {
+            while (!gameOver)
+            {
             if (!playerDead)
                 {
                     PlayerDraw(cursorx, cursory);
                 }
             if(!enemyDead)
-            {
+                {
                 EnemyDraw(enemyCursorx, enemyCursory);
-            }
+                }
             if (!playerDead)
                 {
                     PlayerUpdate();
                 }
             if (!enemyDead)
-            {
-                EnemyUpdate();
-            }
+                {
+                    if (!enemyWasAttacked)
+                    {
+                        EnemyUpdate();
+                    }
+                    enemyWasAttacked = false;
+                }
             RenderMap();
                 Console.WriteLine("Player Health: " + playerHealth);
                 Console.WriteLine("Enemy Health: " + enemyHealth);
             }
-        if (playerVictory)
+            if (playerVictory)
             {
                 Console.Clear();
                 Console.WriteLine("Victory");
             }
-        if (playerDead)
+            if (playerDead)
             {
                 Console.Clear();
                 Console.WriteLine("Game Over");
@@ -364,6 +392,6 @@ namespace TextBasedRPG
         Console.WriteLine();
         Console.WriteLine("Press any key to continue...");
         Console.ReadKey(true);
-    }
+        }
     }
 }
