@@ -26,14 +26,15 @@ namespace TextBasedRPG
         static string[] mapRows = File.ReadAllLines(path);
         #endregion
 
-        #region MapX Axis Length
+        #region Map Axis Lengths
         static int mapXLength = mapRows[0].Length;
+        static int mapYLength = mapRows.Length;
         #endregion
 
         static void RenderMap()
         {
             Console.SetCursorPosition(0, 0);
-        
+
 
             Console.Write('+');
             for (int i = 0; i < mapXLength; i++)
@@ -44,12 +45,12 @@ namespace TextBasedRPG
             Console.WriteLine();
             for (int y = 0; y < mapRows.Length; y++)
             {
-            Console.Write('|');
-            string mapRow = mapRows[y];
-            for (int x = 0; x < mapRow.Length; x++)
-            {
-                char tile = mapRow[x];
-                Console.Write(tile);
+                Console.Write('|');
+                string mapRow = mapRows[y];
+                for (int x = 0; x < mapRow.Length; x++)
+                {
+                    char tile = mapRow[x];
+                    Console.Write(tile);
                     if (cursory - borderOffset > 0)
                     {
                         nextTileUp = mapRows[cursory - 1 - borderOffset][cursorx - borderOffset];
@@ -93,6 +94,7 @@ namespace TextBasedRPG
             }
             Console.Write('+');
             Console.WriteLine();
+            RenderLegend();
             //Console.WriteLine("Current Tile Of The Player Position: " + currentTile);
             //Console.WriteLine("Next Tile Up From The Player Position: " + nextTileUp);
             //Console.WriteLine("Next Tile Down From The Player Position: " + nextTileDown);
@@ -110,6 +112,18 @@ namespace TextBasedRPG
             //Console.WriteLine("Next Tile Down From The Enemy Position: " + enemyNextTileDown);
             //Console.WriteLine("Next Tile Left From The Enemy Position: " + enemyNextTileLeft);
             //Console.WriteLine("Next Tile Right From The Enemy Position: " + enemyNextTileRight);
+            //Console.WriteLine(mapXLength);
+            //Console.WriteLine(mapYLength);
+        }
+
+        static void RenderLegend()
+        {
+            Console.WriteLine("~ - River");
+            Console.WriteLine("  - Grass");
+            Console.WriteLine("A - Village");
+            Console.WriteLine("^ - Mountain (Cannot Climb)");
+            Console.WriteLine("* - Trees");
+            Console.WriteLine();
         }
 
         static bool CheckForWall(char tile, char wallTile)
@@ -203,28 +217,28 @@ namespace TextBasedRPG
             else if (input.Key == ConsoleKey.D)
             {
                 cursorx++;
-                if (cursorx > 34) cursorx = 34;
+                if (cursorx > mapXLength) cursorx = mapXLength;
                 else if (CheckForWall(nextTileRight, wallTile)) cursorx--;
                 else if (enemyCursorx == cursorx && enemyCursory == cursory)
                 {
                     EnemyTakeDamage(1);
                     cursorx--;
                     enemyCursorx++;
-                    if (CheckForWall(enemyNextTileRight, wallTile) || enemyCursorx > 34) enemyCursorx--;
+                    if (CheckForWall(enemyNextTileRight, wallTile) || enemyCursorx > mapXLength) enemyCursorx--;
                     enemyWasAttacked = true;
                 }
             }
             else if (input.Key == ConsoleKey.S)
             {
                 cursory++;
-                if (cursory > 16) cursory = 16;
+                if (cursory > mapYLength) cursory = mapYLength;
                 else if (CheckForWall(nextTileDown, wallTile)) cursory--;
                 else if (enemyCursorx == cursorx && enemyCursory == cursory)
                 {
                     EnemyTakeDamage(1);
                     cursory--;
                     enemyCursory++;
-                    if (CheckForWall(enemyNextTileDown, wallTile) || enemyCursory > 16) enemyCursory--;
+                    if (CheckForWall(enemyNextTileDown, wallTile) || enemyCursory > mapYLength) enemyCursory--;
                     enemyWasAttacked = true;
                 }
             }
@@ -328,14 +342,14 @@ namespace TextBasedRPG
                         break;
                     case 1:
                         enemyCursory++;
-                        if (enemyCursory > 16) enemyCursory = 16;
+                        if (enemyCursory > mapYLength) enemyCursory = mapYLength;
                         else if (CheckForWall(enemyNextTileDown, wallTile)) enemyCursory--;
                         else if (enemyCursorx == cursorx && enemyCursory == cursory)
                         {
                             PlayerTakeDamage(1);
                             enemyCursory--;
                             cursory++;
-                            if (CheckForWall(nextTileDown, wallTile) || cursory > 16)
+                            if (CheckForWall(nextTileDown, wallTile) || cursory > mapYLength)
                             {
                                 cursory--;
                             }
@@ -358,14 +372,14 @@ namespace TextBasedRPG
                         break;
                     case 3:
                         enemyCursorx++;
-                        if (enemyCursorx > 34) enemyCursorx = 34;
+                        if (enemyCursorx > mapXLength) enemyCursorx = mapXLength;
                         else if (CheckForWall(enemyNextTileRight, wallTile)) enemyCursorx--;
                         else if (enemyCursorx == cursorx && enemyCursory == cursory)
                         {
                             PlayerTakeDamage(1);
                             enemyCursorx--;
                             cursorx++;
-                            if (CheckForWall(nextTileRight, wallTile) || cursorx > 34)
+                            if (CheckForWall(nextTileRight, wallTile) || cursorx > mapXLength)
                             {
                                 cursorx--;
                             }
@@ -384,19 +398,19 @@ namespace TextBasedRPG
             Console.WriteLine("Enemy Health: " + enemyHealth);
             while (!gameOver)
             {
-            if (!playerDead)
+                if (!playerDead)
                 {
                     PlayerDraw(cursorx, cursory);
                 }
-            if(!enemyDead)
+                if (!enemyDead)
                 {
-                EnemyDraw(enemyCursorx, enemyCursory);
+                    EnemyDraw(enemyCursorx, enemyCursory);
                 }
-            if (!playerDead)
+                if (!playerDead)
                 {
                     PlayerUpdate();
                 }
-            if (!enemyDead)
+                if (!enemyDead)
                 {
                     if (!enemyWasAttacked)
                     {
@@ -404,7 +418,7 @@ namespace TextBasedRPG
                     }
                     enemyWasAttacked = false;
                 }
-            RenderMap();
+                RenderMap();
                 Console.WriteLine("Player Health: " + playerHealth);
                 Console.WriteLine("Enemy Health: " + enemyHealth);
             }
@@ -418,9 +432,9 @@ namespace TextBasedRPG
                 Console.Clear();
                 Console.WriteLine("Game Over");
             }
-        Console.WriteLine();
-        Console.WriteLine("Press any key to continue...");
-        Console.ReadKey(true);
+            Console.WriteLine();
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
         }
     }
 }
