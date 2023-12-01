@@ -260,25 +260,61 @@ namespace TextBasedRPG
                         enemyCursorx--;
                         if (enemyCursorx < 1) enemyCursorx = 1;
                         else if (enemyNextTileLeft == '^') enemyCursorx++;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursorx++; cursorx -= 2; }
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) 
+                        { 
+                            PlayerTakeDamage(1); 
+                            enemyCursorx++;
+                            cursorx--;
+                            if (nextTileLeft == '^') 
+                            {
+                                cursorx++; 
+                            }
+                        }
                         break;
                     case 1:
                         enemyCursory++;
                         if (enemyCursory > 16) enemyCursory = 16;
                         else if (enemyNextTileDown == '^') enemyCursory--;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursory--; cursory += 2; }
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) 
+                        { 
+                            PlayerTakeDamage(1); 
+                            enemyCursory--; 
+                            cursory ++;
+                            if (nextTileDown == '^')
+                            {
+                                cursory--;
+                            }
+                        }
                         break;
                     case 2:
                         enemyCursory--;
                         if (enemyCursory < 1) enemyCursory = 1;
                         else if (enemyNextTileUp == '^') enemyCursory++;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursory++; cursory -= 2; }
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) 
+                        { 
+                            PlayerTakeDamage(1); 
+                            enemyCursory++; 
+                            cursory --;
+                            if (nextTileUp == '^')
+                            {
+                                cursory++;
+                            }
+                        }
                         break;
                     case 3:
                         enemyCursorx++;
                         if (enemyCursorx > 34) enemyCursorx = 34;
                         else if (enemyNextTileRight == '^') enemyCursorx--;
-                        else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursorx--; cursorx += 2; }
+                        else if (enemyCursorx == cursorx && enemyCursory == cursory) 
+                        { 
+                            PlayerTakeDamage(1); 
+                            enemyCursorx--; 
+                            cursorx ++;
+                            if (nextTileRight == '^')
+                            {
+                                cursorx--;
+                            }
+                        }
                         break;
                 }
             }
