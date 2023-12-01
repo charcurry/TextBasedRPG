@@ -138,6 +138,12 @@ namespace TextBasedRPG
             RenderHealth();
         }
 
+        static void RenderTextScreen(string displayText)
+        {
+            Console.Clear();
+            Console.WriteLine(displayText);
+        }
+
         static bool CheckForWall(char tile, char wallTile)
         {
             if (tile == wallTile)
@@ -434,13 +440,11 @@ namespace TextBasedRPG
             }
             if (playerVictory)
             {
-                Console.Clear();
-                Console.WriteLine("Victory");
+                RenderTextScreen("Victory");
             }
             if (playerDead)
             {
-                Console.Clear();
-                Console.WriteLine("Game Over");
+                RenderTextScreen("Game Over");
             }
             Console.WriteLine();
             Console.WriteLine("Press any key to continue...");
