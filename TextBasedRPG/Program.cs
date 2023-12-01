@@ -10,46 +10,72 @@ namespace TextBasedRPG
 {
     internal class Program
     {
-        static bool enemyDead = false;
+        #region Player Death
         static bool playerDead = false;
+        #endregion
 
+
+        #region Enemy Death
+        static bool enemyDead = false;
+        #endregion
+
+        #region Enemy Cursor Position
+        static int enemyCursory = 10;
+        static int enemyCursorx = 16;
+        #endregion
+
+        #region Player Surrounding Tiles Check
         static char nextTileUp;
         static char nextTileDown;
         static char nextTileLeft;
         static char nextTileRight;
+        #endregion
 
+        #region Player Cursor Positions
         static int cursory = 10;
         static int cursorx = 10;
-        static int enemyCursory = 10;
-        static int enemyCursorx = 16;
+        #endregion
 
+        #region Enemy Surrounding Tiles Check
         static char enemyNextTileUp;
         static char enemyNextTileDown;
         static char enemyNextTileLeft;
         static char enemyNextTileRight;
+        #endregion
 
+        #region GameOver States
         static bool gameOver = false;
         static bool playerVictory = false;
+        #endregion
 
+        #region Health
         static int enemyHealth = 4;
         static int playerHealth = 4;
+        #endregion
 
-        static int mapX;
-
-        static int offset = 1;
-
+        #region Enemy was Attacked Check
         static bool enemyWasAttacked;
+        #endregion
 
+
+        #region Map Organization
+
+        #region Border Offset
+        static int borderOffset = 1;
+        #endregion
+
+        #region Wall Tile Char
         static char wallTile = '^';
+        #endregion
 
-        static void PlayerDraw(int x, int y)
-    {
-        Console.SetCursorPosition(x, y);
-        Console.WriteLine("@");
-    }
-
+        #region Map
         static string path = @"map.txt";
         static string[] mapRows = File.ReadAllLines(path);
+        #endregion
+
+        #region MapX Axis Length
+        static int mapXLength = mapRows[0].Length;
+        #endregion
 
         static void RenderMap()
         {
@@ -57,7 +83,7 @@ namespace TextBasedRPG
         
 
             Console.Write('+');
-            for (int i = 0; i < mapX; i++)
+            for (int i = 0; i < mapXLength; i++)
             {
                 Console.Write('-');
             }
@@ -69,55 +95,46 @@ namespace TextBasedRPG
             string mapRow = mapRows[y];
             for (int x = 0; x < mapRow.Length; x++)
             {
-                mapX = mapRow.Length;
                 char tile = mapRow[x];
                 Console.Write(tile);
-                    //if (cursorx - offset < mapRow.Length && cursorx > 0 && cursory - offset < mapRows.Length && cursory > 0)
-                    //{
-                    //    currentTile = mapRows[cursory - offset][cursorx - offset];
-                    //}
-                    if (cursory - offset > 0)
+                    if (cursory - borderOffset > 0)
                     {
-                        nextTileUp = mapRows[cursory - 1 - offset][cursorx - offset];
+                        nextTileUp = mapRows[cursory - 1 - borderOffset][cursorx - borderOffset];
                     }
-                    if (mapRows.Length - 1 > cursory - offset)
+                    if (mapRows.Length - 1 > cursory - borderOffset)
                     {
-                        nextTileDown = mapRows[cursory + 1 - offset][cursorx - offset];
+                        nextTileDown = mapRows[cursory + 1 - borderOffset][cursorx - borderOffset];
                     }
-                    if (cursorx - offset > 0)
+                    if (cursorx - borderOffset > 0)
                     {
-                        nextTileLeft = mapRows[cursory - offset][cursorx - 1 - offset];
+                        nextTileLeft = mapRows[cursory - borderOffset][cursorx - 1 - borderOffset];
                     }
-                    if (cursorx - offset < mapRow.Length - 1)
+                    if (cursorx - borderOffset < mapRow.Length - 1)
                     {
-                        nextTileRight = mapRows[cursory - offset][cursorx + 1 - offset];
+                        nextTileRight = mapRows[cursory - borderOffset][cursorx + 1 - borderOffset];
                     }
-                    //if (enemyCursorx < mapRow.Length && enemyCursorx > 0 && enemyCursory < mapRows.Length && enemyCursory > 0)
-                    //{
-                    //    enemyCurrentTile = mapRows[enemyCursory - offset][enemyCursorx - offset];
-                    //}
-                    if (enemyCursory - offset > 0)
+                    if (enemyCursory - borderOffset > 0)
                     {
-                        enemyNextTileUp = mapRows[enemyCursory - 1 - offset][enemyCursorx - offset];
+                        enemyNextTileUp = mapRows[enemyCursory - 1 - borderOffset][enemyCursorx - borderOffset];
                     }
-                    if (mapRows.Length - 1 > enemyCursory - offset)
+                    if (mapRows.Length - 1 > enemyCursory - borderOffset)
                     {
-                        enemyNextTileDown = mapRows[enemyCursory + 1 - offset][enemyCursorx - offset];
+                        enemyNextTileDown = mapRows[enemyCursory + 1 - borderOffset][enemyCursorx - borderOffset];
                     }
-                    if (enemyCursorx - offset > 0)
+                    if (enemyCursorx - borderOffset > 0)
                     {
-                        enemyNextTileLeft = mapRows[enemyCursory - offset][enemyCursorx - 1 - offset];
+                        enemyNextTileLeft = mapRows[enemyCursory - borderOffset][enemyCursorx - 1 - borderOffset];
                     }
-                    if (enemyCursorx - offset < mapRow.Length - 1)
+                    if (enemyCursorx - borderOffset < mapRow.Length - 1)
                     {
-                        enemyNextTileRight = mapRows[enemyCursory - offset][enemyCursorx + 1 - offset];
+                        enemyNextTileRight = mapRows[enemyCursory - borderOffset][enemyCursorx + 1 - borderOffset];
                     }
                 }
                 Console.Write('|');
                 Console.WriteLine();
             }
             Console.Write('+');
-            for (int i = 0; i < mapX; i++)
+            for (int i = 0; i < mapXLength; i++)
             {
                 Console.Write('-');
             }
@@ -130,17 +147,30 @@ namespace TextBasedRPG
             //Console.WriteLine("Next Tile Right From The Player Position: " + nextTileRight);
             //Console.WriteLine("Cursor X " + cursorx);
             //Console.WriteLine("Cursor Y " + cursory);
-            Console.WriteLine("Enemy Cursor X " + enemyCursorx);
-            Console.WriteLine("Enemy Cursor Y " + enemyCursory);
+            //Console.WriteLine("Enemy Cursor X " + enemyCursorx);
+            //Console.WriteLine("Enemy Cursor Y " + enemyCursory);
             //Console.WriteLine("Player Dead: " + playerDead);
             //Console.WriteLine("GameOver " + gameOver);
             //Console.WriteLine("Player Victory " + playerVictory);
             //Console.WriteLine("Current Tile Of The Enemy Position: " + enemyCurrentTile);
-            Console.WriteLine("Next Tile Up From The Enemy Position: " + enemyNextTileUp);
-            Console.WriteLine("Next Tile Down From The Enemy Position: " + enemyNextTileDown);
-            Console.WriteLine("Next Tile Left From The Enemy Position: " + enemyNextTileLeft);
-            Console.WriteLine("Next Tile Right From The Enemy Position: " + enemyNextTileRight);
+            //Console.WriteLine("Next Tile Up From The Enemy Position: " + enemyNextTileUp);
+            //Console.WriteLine("Next Tile Down From The Enemy Position: " + enemyNextTileDown);
+            //Console.WriteLine("Next Tile Left From The Enemy Position: " + enemyNextTileLeft);
+            //Console.WriteLine("Next Tile Right From The Enemy Position: " + enemyNextTileRight);
         }
+
+        static bool CheckForWall(char tile, char wallTile)
+        {
+            if (tile == wallTile)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        #endregion
 
         static void EnemyTakeDamage(int damage)
         {
@@ -231,18 +261,6 @@ namespace TextBasedRPG
             if (playerDead)
             {
                 gameOver = true;
-            }
-        }
-
-        static bool CheckForWall(char tile, char wallTile)
-        {
-            if (tile == wallTile)
-            {
-                return true;
-            }
-            else 
-            {
-                return false; 
             }
         }
 
@@ -343,13 +361,14 @@ namespace TextBasedRPG
                 }
             }
         }
-
+        static void PlayerDraw(int x, int y)
+    {
+        Console.SetCursorPosition(x, y);
+        Console.WriteLine("@");
+    }
         static void Main(string[] args)
         {
-            //Console.WriteLine("MiniGame");
-            //Console.WriteLine();
             Console.CursorVisible = false;
-            RenderMap();
             RenderMap();
             Console.WriteLine("Player Health: " + playerHealth);
             Console.WriteLine("Enemy Health: " + enemyHealth);
