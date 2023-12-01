@@ -121,16 +121,16 @@ namespace TextBasedRPG
             //Console.WriteLine("Next Tile Right From The Player Position: " + nextTileRight);
             //Console.WriteLine("Cursor X " + cursorx);
             //Console.WriteLine("Cursor Y " + cursory);
-            //Console.WriteLine("Enemy Cursor X " + enemyCursorx);
-            //Console.WriteLine("Enemy Cursor Y " + enemyCursory);
+            Console.WriteLine("Enemy Cursor X " + enemyCursorx);
+            Console.WriteLine("Enemy Cursor Y " + enemyCursory);
             //Console.WriteLine("Player Dead: " + playerDead);
             //Console.WriteLine("GameOver " + gameOver);
             //Console.WriteLine("Player Victory " + playerVictory);
             //Console.WriteLine("Current Tile Of The Enemy Position: " + enemyCurrentTile);
-            //Console.WriteLine("Next Tile Up From The Enemy Position: " + enemyNextTileUp);
-            //Console.WriteLine("Next Tile Down From The Enemy Position: " + enemyNextTileDown);
-            //Console.WriteLine("Next Tile Left From The Enemy Position: " + enemyNextTileLeft);
-            //Console.WriteLine("Next Tile Right From The Enemy Position: " + enemyNextTileRight);
+            Console.WriteLine("Next Tile Up From The Enemy Position: " + enemyNextTileUp);
+            Console.WriteLine("Next Tile Down From The Enemy Position: " + enemyNextTileDown);
+            Console.WriteLine("Next Tile Left From The Enemy Position: " + enemyNextTileLeft);
+            Console.WriteLine("Next Tile Right From The Enemy Position: " + enemyNextTileRight);
         }
 
         static void EnemyTakeDamage(int damage)
@@ -168,6 +168,7 @@ namespace TextBasedRPG
                     EnemyTakeDamage(1);
                     cursory++;
                     enemyCursory--;
+                    if (enemyNextTileUp == '^') enemyCursory++;
                 }
             }
         else if (input.Key == ConsoleKey.A)
@@ -180,6 +181,7 @@ namespace TextBasedRPG
                     EnemyTakeDamage(1);
                     cursorx++;
                     enemyCursorx--;
+                    if (enemyNextTileLeft == '^') enemyCursorx++;
                 }
             }
         else if (input.Key == ConsoleKey.D)
@@ -192,6 +194,7 @@ namespace TextBasedRPG
                     EnemyTakeDamage(1);
                     cursorx--;
                     enemyCursorx++;
+                    if (enemyNextTileRight == '^') enemyCursorx--;
                 }
             }
         else if (input.Key == ConsoleKey.S)
@@ -204,6 +207,7 @@ namespace TextBasedRPG
                     EnemyTakeDamage(1);
                     cursory--;
                     enemyCursory++;
+                    if (enemyNextTileDown == '^') enemyCursory--;
                 }
             }
         else if (input.Key == ConsoleKey.Escape)
@@ -254,25 +258,25 @@ namespace TextBasedRPG
                 {
                     case 0:
                         enemyCursorx--;
-                        if (enemyCursorx < 0) enemyCursorx = 0;
+                        if (enemyCursorx < 1) enemyCursorx = 1;
                         else if (enemyNextTileLeft == '^') enemyCursorx++;
                         else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursorx++; cursorx -= 2; }
                         break;
                     case 1:
                         enemyCursory++;
-                        if (enemyCursory > 15) enemyCursory = 15;
+                        if (enemyCursory > 16) enemyCursory = 16;
                         else if (enemyNextTileDown == '^') enemyCursory--;
                         else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursory--; cursory += 2; }
                         break;
                     case 2:
                         enemyCursory--;
-                        if (enemyCursory < 0) enemyCursory = 0;
+                        if (enemyCursory < 1) enemyCursory = 1;
                         else if (enemyNextTileUp == '^') enemyCursory++;
                         else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursory++; cursory -= 2; }
                         break;
                     case 3:
                         enemyCursorx++;
-                        if (enemyCursorx > 33) enemyCursorx = 33;
+                        if (enemyCursorx > 34) enemyCursorx = 34;
                         else if (enemyNextTileRight == '^') enemyCursorx--;
                         else if (enemyCursorx == cursorx && enemyCursory == cursory) { PlayerTakeDamage(1); enemyCursorx--; cursorx += 2; }
                         break;
