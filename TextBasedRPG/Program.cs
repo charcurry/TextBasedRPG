@@ -94,7 +94,6 @@ namespace TextBasedRPG
             }
             Console.Write('+');
             Console.WriteLine();
-            RenderLegend();
             //Console.WriteLine("Current Tile Of The Player Position: " + currentTile);
             //Console.WriteLine("Next Tile Up From The Player Position: " + nextTileUp);
             //Console.WriteLine("Next Tile Down From The Player Position: " + nextTileDown);
@@ -124,6 +123,19 @@ namespace TextBasedRPG
             Console.WriteLine("^ - Mountain (Cannot Climb)");
             Console.WriteLine("* - Trees");
             Console.WriteLine();
+        }
+
+        static void RenderHealth()
+        {
+            Console.WriteLine("Player Health: " + playerHealth);
+            Console.WriteLine("Enemy Health: " + enemyHealth);
+            Console.WriteLine();
+        }
+
+        static void ShowHUD()
+        {
+            RenderLegend();
+            RenderHealth();
         }
 
         static bool CheckForWall(char tile, char wallTile)
@@ -394,8 +406,7 @@ namespace TextBasedRPG
         {
             Console.CursorVisible = false;
             RenderMap();
-            Console.WriteLine("Player Health: " + playerHealth);
-            Console.WriteLine("Enemy Health: " + enemyHealth);
+            ShowHUD();
             while (!gameOver)
             {
                 if (!playerDead)
@@ -419,8 +430,7 @@ namespace TextBasedRPG
                     enemyWasAttacked = false;
                 }
                 RenderMap();
-                Console.WriteLine("Player Health: " + playerHealth);
-                Console.WriteLine("Enemy Health: " + enemyHealth);
+                ShowHUD();
             }
             if (playerVictory)
             {
