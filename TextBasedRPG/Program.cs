@@ -10,53 +10,6 @@ namespace TextBasedRPG
 {
     internal class Program
     {
-        #region Player Death
-        static bool playerDead = false;
-        #endregion
-
-
-        #region Enemy Death
-        static bool enemyDead = false;
-        #endregion
-
-        #region Enemy Cursor Position
-        static int enemyCursory = 10;
-        static int enemyCursorx = 16;
-        #endregion
-
-        #region Player Surrounding Tiles Check
-        static char nextTileUp;
-        static char nextTileDown;
-        static char nextTileLeft;
-        static char nextTileRight;
-        #endregion
-
-        #region Player Cursor Positions
-        static int cursory = 10;
-        static int cursorx = 10;
-        #endregion
-
-        #region Enemy Surrounding Tiles Check
-        static char enemyNextTileUp;
-        static char enemyNextTileDown;
-        static char enemyNextTileLeft;
-        static char enemyNextTileRight;
-        #endregion
-
-        #region GameOver States
-        static bool gameOver = false;
-        static bool playerVictory = false;
-        #endregion
-
-        #region Health
-        static int enemyHealth = 4;
-        static int playerHealth = 4;
-        #endregion
-
-        #region Enemy was Attacked Check
-        static bool enemyWasAttacked;
-        #endregion
-
 
         #region Map Organization
 
@@ -172,15 +125,37 @@ namespace TextBasedRPG
         }
         #endregion
 
-        static void EnemyTakeDamage(int damage)
+        #region Player Organization
+
+        #region GameOver States
+        static bool gameOver = false;
+        static bool playerVictory = false;
+        #endregion
+
+        #region Player Death
+        static bool playerDead = false;
+        #endregion
+
+        #region Player Surrounding Tiles Check
+        static char nextTileUp;
+        static char nextTileDown;
+        static char nextTileLeft;
+        static char nextTileRight;
+        #endregion
+
+        #region Player Health
+        static int playerHealth = 4;
+        #endregion
+
+        #region Player Cursor Positions
+        static int cursory = 10;
+        static int cursorx = 10;
+        #endregion
+
+        static void PlayerDraw(int x, int y)
         {
-            enemyHealth -= damage;
-            if (enemyHealth <= 0)
-            {
-                enemyDead = true;
-                gameOver = true;
-                playerVictory = true;
-            }
+            Console.SetCursorPosition(x, y);
+            Console.WriteLine("@");
         }
 
         static void PlayerTakeDamage(int damage)
@@ -261,6 +236,44 @@ namespace TextBasedRPG
             if (playerDead)
             {
                 gameOver = true;
+            }
+        }
+        #endregion
+
+        #region Enemy Organization
+
+        #region Enemy Death
+        static bool enemyDead = false;
+        #endregion
+
+        #region Enemy Cursor Position
+        static int enemyCursory = 10;
+        static int enemyCursorx = 16;
+        #endregion
+
+        #region Enemy Health
+        static int enemyHealth = 4;
+        #endregion
+
+        #region Enemy was Attacked Check
+        static bool enemyWasAttacked;
+        #endregion
+
+        #region Enemy Surrounding Tiles Check
+        static char enemyNextTileUp;
+        static char enemyNextTileDown;
+        static char enemyNextTileLeft;
+        static char enemyNextTileRight;
+        #endregion
+
+        static void EnemyTakeDamage(int damage)
+        {
+            enemyHealth -= damage;
+            if (enemyHealth <= 0)
+            {
+                enemyDead = true;
+                gameOver = true;
+                playerVictory = true;
             }
         }
 
@@ -361,11 +374,8 @@ namespace TextBasedRPG
                 }
             }
         }
-        static void PlayerDraw(int x, int y)
-    {
-        Console.SetCursorPosition(x, y);
-        Console.WriteLine("@");
-    }
+        #endregion
+
         static void Main(string[] args)
         {
             Console.CursorVisible = false;
