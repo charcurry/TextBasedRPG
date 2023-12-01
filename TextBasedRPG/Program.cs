@@ -192,11 +192,14 @@ namespace TextBasedRPG
 
         static void PlayerTakeDamage(int damage)
         {
-            playerHealth -= damage;
-            if (playerHealth <= 0)
+            if (damage >= 0)
             {
-                playerDead = true;
-                gameOver = true;
+                playerHealth -= damage;
+                if (playerHealth <= 0)
+                {
+                    playerDead = true;
+                    gameOver = true;
+                }
             }
         }
 
@@ -300,12 +303,15 @@ namespace TextBasedRPG
 
         static void EnemyTakeDamage(int damage)
         {
-            enemyHealth -= damage;
-            if (enemyHealth <= 0)
+            if (damage > 0)
             {
-                enemyDead = true;
-                gameOver = true;
-                playerVictory = true;
+                enemyHealth -= damage;
+                if (enemyHealth <= 0)
+                {
+                    enemyDead = true;
+                    gameOver = true;
+                    playerVictory = true;
+                }
             }
         }
 
